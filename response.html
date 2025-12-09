@@ -1,0 +1,62 @@
+
+<!doctype html>
+<html>
+<head>
+        <meta charset="utf-8">
+        <title>Media Downloader</title>
+        <style>
+                body{font-family:Inter,system-ui,Arial,sans-serif;max-width:900px;margin:36px auto;color:#222}
+                h1{color:#0a58ca}
+                label{display:block;margin:10px 0;font-weight:600}
+                input[type=text], select{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd}
+                button{background:#0a58ca;color:white;padding:10px 16px;border-radius:8px;border:none;cursor:pointer}
+                .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(10,20,50,0.06)}
+                .muted{color:#666;font-size:0.9em}
+        </style>
+</head>
+<body>
+<div class="card">
+        <h1>Media Downloader</h1>
+        <p class="muted">Paste a link from a supported platform, choose the source and type, then click Download.</p>
+        <form method="post" action="/start">
+                <label>URL
+                        <input name="url" type="text" placeholder="https://...">
+                </label>
+
+                <label>Platform
+                        <select name="platform">
+                                <option value="auto">Auto-detect</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="vk">VK</option>
+                                <option value="soundcloud">SoundCloud</option>
+                                <option value="spotify">Spotify</option>
+                                <option value="pinterest">Pinterest</option>
+                                <option value="other">Other</option>
+                        </select>
+                </label>
+
+                <label>Type
+                        <select name="kind">
+                                <option value="video">Video</option>
+                                <option value="audio">Audio (mp3)</option>
+                        </select>
+                </label>
+
+                <p class="muted">Cookies and max-file-size options removed for clarity. For private/protected content you will need to run yt-dlp locally with credentials.</p>
+
+                <button type="submit">Download</button>
+        </form>
+        <div style="margin-top:12px" id="result"></div>
+</div>
+<script>
+// optional: show a simple loading state after submit
+const form = document.querySelector('form');
+form.addEventListener('submit', ()=>{
+        const r = document.getElementById('result');
+        r.innerText = 'Starting download — this may take a while. Please wait...';
+});
+</script>
+</body>
+</html>
