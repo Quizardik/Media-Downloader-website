@@ -46,13 +46,7 @@ def download_media(url: str, kind: str = 'video', job_id: Optional[str] = None, 
         'quiet': True,
         'socket_timeout': 60,
         'http_headers': {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'},
-        'extractor_args': {
-            'youtube': {
-                'skip_webpage': False,
-                'player_client': 'web',
-            }
-        },
-        'age_limit': None,  # Bypass age restriction
+        'age_limit': None,
     }
 
     if kind == 'video':
@@ -68,10 +62,16 @@ def download_media(url: str, kind: str = 'video', job_id: Optional[str] = None, 
 
     # handle cookies: if cookies_text provided, write to a temporary file and pass cookiefile
     cookiefile = None
-    if cookies_text:
+    if cookies_text and cookies_text.strip():
         cookiefile = os.path.join(DOWNLOAD_DIR, f'cookies-{job_id}.txt')
+        # Ensure cookies text is properly formatted (each line is a cookie entry)
+        # Remove any BOM or extra whitespace at start/end
+        cookies_clean = cookies_text.strip()
+        if not cookies_clean.startswith('# Netscape HTTP Cookie File'):
+            # If it doesn't look like a Netscape cookie file, just write it as-is
+            pass
         with open(cookiefile, 'w', encoding='utf-8') as f:
-            f.write(cookies_text)
+            f.write(cookies_clean)
         opts['cookiefile'] = cookiefile
         print(f'[INFO] Using cookies file: {cookiefile}', flush=True)
 
