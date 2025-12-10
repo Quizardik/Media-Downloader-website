@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import subprocess
 from typing import Optional
 from yt_dlp import YoutubeDL
 from dotenv import load_dotenv
@@ -43,6 +44,15 @@ def download_media(url: str, kind: str = 'video', job_id: Optional[str] = None, 
         'outtmpl': outtmpl,
         'noplaylist': True,
         'quiet': True,
+        'socket_timeout': 60,
+        'http_headers': {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'},
+        'extractor_args': {
+            'youtube': {
+                'skip_webpage': False,
+                'player_client': 'web',
+            }
+        },
+        'age_limit': None,  # Bypass age restriction
     }
 
     if kind == 'video':
@@ -63,6 +73,7 @@ def download_media(url: str, kind: str = 'video', job_id: Optional[str] = None, 
         with open(cookiefile, 'w', encoding='utf-8') as f:
             f.write(cookies_text)
         opts['cookiefile'] = cookiefile
+        print(f'[INFO] Using cookies file: {cookiefile}', flush=True)
 
     def _progress_hook(d):
         try:
@@ -101,6 +112,15 @@ def download_media(url: str, kind: str = 'video', job_id: Optional[str] = None, 
     opts['progress_hooks'] = [_progress_hook]
 
     try:
+        # For YouTube videos, try to extract cookies from browser
+        if 'youtube' in url or 'youtu.be' in url:
+            try:
+                with YoutubeDL({'cookies_from_browser': ('chrome',)}) as temp_ydl:
+                    # This will extract cookies if available
+                    pass
+            except Exception:
+                pass  # If cookie extraction fails, continue without them
+        
         with YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)

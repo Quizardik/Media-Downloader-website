@@ -346,6 +346,17 @@ TEMPLATE = '''
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="cookies"><span class="icon">🍪</span>Cookies (Optional)</label>
+        <textarea 
+          id="cookies"
+          name="cookies" 
+          style="background: rgba(20, 20, 35, 0.8); border: 1.5px solid rgba(100, 150, 255, 0.3); color: #e0e0e0; padding: 12px 16px; border-radius: 12px; font-size: 12px; font-family: monospace; resize: vertical; min-height: 80px; transition: all 0.3s ease;"
+          placeholder="Paste YouTube cookies here if download fails. Export from Chrome using Get cookies.txt extension"
+        ></textarea>
+        <div class="helper-text">Only needed if age-restricted videos fail to download</div>
+      </div>
+
       <div class="button-group">
         <button type="submit">
           <span>⬇️ Download</span>
@@ -439,12 +450,13 @@ def start():
         url = request.form.get('url', '').strip()
         kind = request.form.get('kind', 'video')
         platform = request.form.get('platform', 'auto')
+        cookies_text = request.form.get('cookies', '').strip()
         if not url:
                 return 'Provide URL', 400
 
         # call downloader synchronously; disable redis writes for this immediate flow
         try:
-                path = download_media(url, kind=kind, job_id=None, cookies_text=None, max_filesize=None, use_redis=False)
+                path = download_media(url, kind=kind, job_id=None, cookies_text=cookies_text if cookies_text else None, max_filesize=None, use_redis=False)
         except Exception as e:
                 error_msg = f'Error during download: {str(e)}'
                 print(f'[ERROR] {error_msg}', flush=True)  # log to container stdout
